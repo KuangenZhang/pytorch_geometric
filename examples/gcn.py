@@ -1,3 +1,7 @@
+import sys
+project_path = '../'
+sys.path.insert(0, project_path)
+
 import os.path as osp
 import argparse
 
