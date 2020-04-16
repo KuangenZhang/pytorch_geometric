@@ -2,7 +2,7 @@ import os.path as osp
 
 import torch
 import torch.nn.functional as F
-from torch.nn import Sequential as Seq, Linear as Lin, ReLU, BatchNorm1d as BN
+from torch.nn import Sequential as Seq, Linear as Lin, ReLU, LeakyReLU, BatchNorm1d as BN
 from torch_geometric.datasets import ModelNet
 import torch_geometric.transforms as T
 from torch_geometric.data import DataLoader
@@ -41,7 +41,8 @@ class GlobalSAModule(torch.nn.Module):
 
 def MLP(channels, batch_norm=True):
     return Seq(*[
-        Seq(Lin(channels[i - 1], channels[i]), ReLU(), BN(channels[i]))
+        Seq(Lin(channels[i - 1], channels[i]), LeakyReLU(negative_slope=0.2),
+            BN(channels[i]))
         for i in range(1, len(channels))
     ])
 

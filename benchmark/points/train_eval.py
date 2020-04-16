@@ -16,6 +16,7 @@ def run(train_dataset, test_dataset, model, epochs, batch_size, lr,
         lr_decay_factor, lr_decay_step_size, weight_decay):
 
     model = model.to(device)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-4)
     optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     # train_loader = DataLoader(ModelNet40(partition='train', num_points=1024), num_workers=8,
@@ -30,7 +31,7 @@ def run(train_dataset, test_dataset, model, epochs, batch_size, lr,
     pbar = tqdm(total=epochs, initial=0, position=0, leave=True)
 
     for epoch in range(1, epochs + 1):
-        pbar.update(1)
+
         if torch.cuda.is_available():
             torch.cuda.synchronize()
 
@@ -45,16 +46,16 @@ def run(train_dataset, test_dataset, model, epochs, batch_size, lr,
         t_end = time.perf_counter()
 
         if best_test_acc < test_acc:
-            print('Epoch: {:03d}, Test: {:.4f}, Duration: {:.2f}'.format(
-                epoch, test_acc, t_end - t_start))
             best_test_acc = test_acc
 
+        print('Epoch: {:03d}, Test: {:.4f}, Best test: {:.4f}, Duration: {:.2f}'.format(
+            epoch, test_acc, best_test_acc, t_end - t_start))
 
         if epoch % lr_decay_step_size == 0:
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr_decay_factor * param_group['lr']
 
-
+        pbar.update(1)
 
 def train(model, optimizer, train_loader, device):
     model.train()
